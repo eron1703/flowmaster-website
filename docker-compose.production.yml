@@ -41,7 +41,7 @@ services:
         define('WP_HOME', 'https://flow-master.tech');
         define('WP_SITEURL', 'https://flow-master.tech');
         define('FORCE_SSL_ADMIN', true);
-        if ($$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') $$_SERVER['HTTPS']='on';
+        if (isset($$_SERVER['HTTP_X_FORWARDED_PROTO']) && $$_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') $$_SERVER['HTTPS']='on';
     volumes:
       - wordpress_data:/var/www/html
       - ./wp-content:/var/www/html/wp-content
