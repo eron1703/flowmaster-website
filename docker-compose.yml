@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # MySQL Database for WordPress
+  db:
+    image: mysql:8.0
+    container_name: flowmaster-website-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: flowmaster_wp_root_2025
+      MYSQL_DATABASE: flowmaster_website
+      MYSQL_USER: flowmaster_wp
+      MYSQL_PASSWORD: flowmaster_wp_secure_2025
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - flowmaster-website-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pflowmaster_wp_root_2025"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # WordPress with Elementor
+  wordpress:
+    image: wordpress:latest
+    container_name: flowmaster-website-wp
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8090:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: flowmaster_wp
+      WORDPRESS_DB_PASSWORD: flowmaster_wp_secure_2025
+      WORDPRESS_DB_NAME: flowmaster_website
+      WORDPRESS_TABLE_PREFIX: fm_
+      WORDPRESS_DEBUG: 'false'
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    networks:
+      - flowmaster-website-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # WP-CLI for automation
+  wpcli:
+    image: wordpress:cli
+    container_name: flowmaster-website-cli
+    depends_on:
+      - wordpress
+      - db
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: flowmaster_wp
+      WORDPRESS_DB_PASSWORD: flowmaster_wp_secure_2025
+      WORDPRESS_DB_NAME: flowmaster_website
+    networks:
+      - flowmaster-website-network
+    entrypoint: sh
+    command: -c "sleep infinity"
+
+networks:
+  flowmaster-website-network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
+  wordpress_data:
+    driver: local

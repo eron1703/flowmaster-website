@@ -1,0 +1,43 @@
+# WordPress
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+wp-content/backups/
+
+# Database dumps
+*.sql
+backup*.sql
+
+# Environment files
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+package-lock.json
+npm-debug.log
+
+# Screenshots and test results
+screenshots/
+test-results.json
+
+# Docker volumes (not tracked)
+db_data/
+wordpress_data/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
